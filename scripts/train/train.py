@@ -21,6 +21,7 @@ from llmfoundry.utils.builders import (build_algorithm, build_callback,
                                        build_tokenizer)
 from llmfoundry.utils.config_utils import log_config, update_batch_size_info
 
+# os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 def validate_config(cfg):
     """Validates compatible model and dataloader selection."""
@@ -130,6 +131,7 @@ def main(cfg):
     # when multiple GPUs are available.
     # Also 'meta' is only valid when using FSDP
     init_context = contextlib.nullcontext()
+
     if 'init_device' in cfg.model:
         assert cfg.model.init_device in ['meta', 'cpu']
         if fsdp_config is None and cfg.model.init_device == 'meta':

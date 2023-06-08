@@ -1,4 +1,4 @@
-max_seq_len: 512
+max_seq_len: 2048
 global_seed: 17
 
 # Run Name
@@ -25,8 +25,10 @@ tokenizer:
 train_loader:
   name: finetuning
   dataset:
-    hf_name: mosaicml/dolly_hhrlhf
+    hf_name: json
     split: train
+    hf_kwargs:
+      data_dir: /home/data/prompt/mpt_train
     max_seq_len: ${max_seq_len}
     allow_pad_trimming: false
     decoder_only_format: true
@@ -45,8 +47,10 @@ train_loader:
 eval_loader:
   name: finetuning
   dataset:
-    hf_name: mosaicml/dolly_hhrlhf
-    split: test
+    hf_name: json
+    split: validation
+    hf_kwargs:
+      data_dir: /home/data/prompt/mpt_val
     max_seq_len: ${max_seq_len}
     allow_pad_trimming: false
     decoder_only_format: true
@@ -80,7 +84,7 @@ algorithms:
     clipping_type: norm
     clipping_threshold: 1.0
 
-max_duration: 2ep  # 2-3 epochs seems like the sweet spot
+max_duration: 3ep  # 2-3 epochs seems like the sweet spot
 eval_interval: 1ep
 # eval_subset_num_batches: -1
 eval_first: true
@@ -115,11 +119,13 @@ callbacks:
   memory_monitor: {}
   runtime_estimator: {}
 
-# loggers:
-#   wandb: {}
-
+loggers:
+  wandb:
+    project: prodchat_mpt
+    name: ${run_name}
+    entity: miyoung
 # Checkpoint to local filesystem or remote object store
-# save_interval: 5000ba
-# save_num_checkpoints_to_keep: 1  # Important, this cleans up checkpoints saved to DISK
-# save_folder: ./{run_name}/checkpoints
+save_interval: 5000ba
+save_num_checkpoints_to_keep: 1  # Important, this cleans up checkpoints saved to DISK
+save_folder: /home/my_checkpoints/mpt_v1
 # save_folder: s3://my-bucket/my-folder/{run_name}/checkpoints
